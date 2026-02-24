@@ -81,3 +81,77 @@ pnpm dev
 
 ## ⚠️ Notes on API Limits
 Image generation models (like `gemini-2.5-flash-image` or `imagen-3.0-generate-002`) have strict rate limits and quotas under the free tier. If you encounter a `429 Resource Exhausted` or `Quota` error, you may need to either link your API key to a billed Google Cloud Project or utilize a mock-mode.
+
+## ☁️ Deployment (Google Cloud Run)
+
+The application can be deployed reproducibly to Google Cloud Run using Terraform. This deploys a single container that serves both the built React frontend and the Express backend.
+
+### Prerequisites
+- [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) (`gcloud`) installed and authenticated.
+- [Terraform](https://developer.hashicorp.com/terraform/downloads) installed.
+- A Google Cloud Project with billing enabled.
+
+### Deployment Steps
+
+1. **Authenticate with Google Cloud:**
+   ```bash
+   gcloud auth login
+   gcloud auth application-default login
+   gcloud config set project YOUR_PROJECT_ID
+   ```
+
+2. **Initialize Terraform:**
+   ```bash
+   cd terraform
+   terraform init
+   ```
+
+3. **Provide your Variables:**
+   Create a `terraform.tfvars` file in the `terraform/` directory:
+   ```hcl
+   project_id          = "your-gcp-project-id"
+   region              = "europe-west3"
+   nano_banana_api_key = "your_gemini_api_key_here"
+   ```
+
+4. **Create the Artifact Registry:**
+   First, we need to create the Docker repository before we can push our image.
+   ```bash
+   terraform apply -target=google_artifact_registry_repository.app_repo
+   ```
+
+5. **Build and Push the Docker Image:**
+   Return to the project root to build the monolithic container image and push it to the new registry.
+   *(Replace `europe-west3` and `YOUR_PROJECT_ID` with your actual values)*
+   
+   ```bash
+   cd ..
+   
+   # Authenticate Docker with your region
+   gcloud auth configure-docker europe-west3-docker.pkg.dev
+   
+   # Build the image
+   docker build -t europe-west3-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest .
+   
+   # Push the image
+   docker push europe-west3-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest
+   ```
+
+6. **Deploy the Cloud Run Service:**
+   Now deploy the actual Cloud Run service using the image you just pushed.
+   ```bash
+   cd terraform
+   
+   # We specify the image_url variable to use our newly pushed image
+   terraform apply -var="image_url=europe-west3-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest"
+   ```
+
+After applying, Terraform will output your public `service_url`.
+
+### Continuous Updates
+To deploy a new version of your code later, simply rebuild and push the Docker image, then tell Cloud Run to update:
+```bash
+gcloud run deploy instant-architect \
+  --image europe-west3-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest \
+  --region europe-west3
+```
