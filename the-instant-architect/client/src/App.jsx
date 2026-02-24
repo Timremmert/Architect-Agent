@@ -80,6 +80,27 @@ function App() {
 
         // Trigger the Inpainting workflow with the style context!
         handleInpaintRequest(args.furniture_type, args.material, args.coordinates, args.style || currentStyle);
+
+      } else if (functionCall.name === 'render_room') {
+        console.log("Gemini wants to render room:", args);
+
+        if (args.style) {
+          console.log("Setting style to:", args.style);
+          setCurrentStyle(args.style);
+        }
+
+        if (sendToolResponse) {
+          sendToolResponse([{
+            id: functionCall.id || "2",
+            name: functionCall.name,
+            response: { result: "Room rendering started, generating new room design now. Tell the user it will take a few seconds." }
+          }]);
+        }
+
+        // Trigger the Inpainting workflow for a full room redesign
+        const mockMaterial = args.color_palette || "matching colors";
+        const styleContext = args.style ? `${args.style} style, Mood: ${args.mood || 'matching'}` : `Mood: ${args.mood || 'matching'}`;
+        handleInpaintRequest("entire room redesign", mockMaterial, "everywhere", styleContext || currentStyle);
       }
     });
   }, [onFunctionCall, sendToolResponse, currentStyle]);
