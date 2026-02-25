@@ -12,7 +12,7 @@ COPY . .
 RUN pnpm install
 
 # Build the frontend application
-RUN pnpm run build --filter client
+RUN pnpm --filter client run build
 
 # Expose standard Cloud Run port (Cloud Run sets PORT automatically)
 EXPOSE 8080

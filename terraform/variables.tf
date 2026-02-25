@@ -6,13 +6,7 @@ variable "project_id" {
 variable "region" {
   type        = string
   description = "The region to deploy resources to"
-  default     = "europe-west3" 
-}
-
-variable "nano_banana_api_key" {
-  type        = string
-  description = "The API key for Gemini / Nano Banana used in the backend server"
-  sensitive   = true
+  default     = "europe-west1" 
 }
 
 variable "image_url" {

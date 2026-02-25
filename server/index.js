@@ -21,7 +21,11 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 import { GoogleGenAI } from '@google/genai';
 
-const ai = new GoogleGenAI({ apiKey: process.env.NANO_BANANA_API_KEY });
+const ai = new GoogleGenAI({
+    vertexai: true,
+    project: 'gen-lang-client-0208563832',
+    location: 'europe-west1',
+});
 
 app.post('/api/inpaint', upload.single('image'), async (req, res) => {
     try {
@@ -31,11 +35,12 @@ app.post('/api/inpaint', upload.single('image'), async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ success: false, error: 'No image provided' });
         }
-
+        /** 
         if (!process.env.NANO_BANANA_API_KEY || process.env.NANO_BANANA_API_KEY === 'your_placeholder_api_key_here') {
             console.warn("WARNING: No valid NANO_BANANA_API_KEY provided. Please set it in server/.env");
             return res.status(500).json({ success: false, error: 'API Key missing in backend' });
         }
+        */
 
         // Convert the Multer memory buffer to the format GenAI SDK wants
         const base64Image = req.file.buffer.toString('base64');
@@ -98,10 +103,38 @@ app.post('/api/inpaint', upload.single('image'), async (req, res) => {
     }
 });
 
+// Endpoint to provide frontend with a short-lived access token for vertex ai
+import { GoogleAuth } from 'google-auth-library';
+
+const auth = new GoogleAuth({
+    scopes: ['https://www.googleapis.com/auth/cloud-platform']
+});
+
+app.get('/api/token', async (req, res) => {
+    try {
+        const client = await auth.getClient();
+        const accessToken = await client.getAccessToken();
+
+        if (!accessToken.token) {
+            throw new Error('Failed to retrieve access token');
+        }
+
+        res.json({
+            success: true,
+            token: accessToken.token,
+            project: process.env.GOOGLE_CLOUD_PROJECT || 'gen-lang-client-0208563832',
+            location: process.env.GOOGLE_CLOUD_LOCATION || 'europe-west1'
+        });
+    } catch (error) {
+        console.error('Error generating token:', error);
+        res.status(500).json({ success: false, error: 'Failed to generate auth token' });
+    }
+});
+
 // Serving the React frontend in production
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
-app.get('*', (req, res) => {
+app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 

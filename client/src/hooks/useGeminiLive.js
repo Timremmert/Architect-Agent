@@ -76,16 +76,30 @@ export function useGeminiLive(apiKey, model = "models/gemini-2.5-flash-native-au
     }, []);
 
     const connect = useCallback(async () => {
-        if (!apiKey) {
-            console.error("No Gemini API key provided for Live API");
-            return;
-        }
-
         setStatus('connecting');
 
-        const ai = new GoogleGenAI({ apiKey });
-
         try {
+            // Fetch token from backend!
+            // Use relative paths in production to route to the same origin (Express server)
+            const baseUrl = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001');
+            const tokenRes = await fetch(`${baseUrl}/api/token`);
+            const tokenData = await tokenRes.json();
+
+            if (!tokenData.success || !tokenData.token) {
+                throw new Error("Failed to get Vertex AI token from backend");
+            }
+
+            const ai = new GoogleGenAI({
+                vertexai: {
+                    project: tokenData.project,
+                    location: tokenData.location
+                },
+                httpOptions: {
+                    headers: {
+                        Authorization: `Bearer ${tokenData.token}`
+                    }
+                }
+            });
             const session = await ai.live.connect({
                 model: model,
                 config: {

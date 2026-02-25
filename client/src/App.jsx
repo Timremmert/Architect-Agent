@@ -134,7 +134,8 @@ function App() {
         formData.append('style', styleContext);
       }
 
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+      // Use relative paths in production to route to the same origin (Express server)
+      const baseUrl = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001');
 
       const apiResponse = await fetch(`${baseUrl}/api/inpaint`, {
         method: 'POST',

@@ -38,11 +38,12 @@ The project is structured as a Monorepo containing a modern web frontend and a l
 5. **The In-Painting:** The Node.js server routes the image and the formulated prompt to Google's Image Generation API.
 6. **The Result:** The backend returns the final generated image (Base64), which the frontend overlays beautifully onto your screen as a "Wow" moment.
 
-## 🛠️ Setup Instructions
+## 🛠️ Local Setup Instructions
 
 ### Prerequisites
 - Node.js (v18+ recommended)
-- A valid Google AI Studio API Key with access to the Gemini Live API and Image Generation endpoints.
+- A Google Cloud Project with Vertex AI API enabled.
+- [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) (`gcloud`) installed and authenticated.
 
 ### 1. Clone & Install
 ```bash
@@ -54,21 +55,26 @@ pnpm install
 ```
 
 ### 2. Environment Variables
-You need to configure your API keys in both the client and server.
+You only need to configure the backend API URL for the frontend.
 
 **Frontend (`client/.env`):**
 ```env
-VITE_GEMINI_API_KEY=your_gemini_api_key_here
 VITE_API_BASE_URL=http://localhost:3001
 ```
 
 **Backend (`server/.env`):**
 ```env
 PORT=3001
-NANO_BANANA_API_KEY=your_gemini_api_key_here
 ```
 
-### 3. Run the Development Server
+### 3. Google Cloud Authentication
+Since the application connects directly to Vertex AI, you need to authorize your local environment using Application Default Credentials (ADC) and specify your project ID:
+```bash
+gcloud auth application-default login
+gcloud config set project YOUR_PROJECT_ID
+```
+
+### 4. Run the Development Server
 From the root `the-instant-architect` directory, you can start both the frontend and the backend simultaneously:
 ```bash
 pnpm dev
@@ -110,8 +116,7 @@ The application can be deployed reproducibly to Google Cloud Run using Terraform
    Create a `terraform.tfvars` file in the `terraform/` directory:
    ```hcl
    project_id          = "your-gcp-project-id"
-   region              = "europe-west3"
-   nano_banana_api_key = "your_gemini_api_key_here"
+   region              = "europe-west1"
    ```
 
 4. **Create the Artifact Registry:**
@@ -131,7 +136,7 @@ The application can be deployed reproducibly to Google Cloud Run using Terraform
    gcloud auth configure-docker europe-west3-docker.pkg.dev
    
    # Build the image
-   docker build -t europe-west3-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest .
+   docker build --platform linux/amd64 -t europe-west3-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest .
    
    # Push the image
    docker push europe-west3-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest
@@ -143,7 +148,7 @@ The application can be deployed reproducibly to Google Cloud Run using Terraform
    cd terraform
    
    # We specify the image_url variable to use our newly pushed image
-   terraform apply -var="image_url=europe-west3-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest"
+   terraform apply -var="image_url=europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest"
    ```
 
 After applying, Terraform will output your public `service_url`.
@@ -152,6 +157,6 @@ After applying, Terraform will output your public `service_url`.
 To deploy a new version of your code later, simply rebuild and push the Docker image, then tell Cloud Run to update:
 ```bash
 gcloud run deploy instant-architect \
-  --image europe-west3-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest \
-  --region europe-west3
+  --image europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest \
+  --region europe-west1
 ```
