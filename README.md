@@ -99,64 +99,25 @@ The application can be deployed reproducibly to Google Cloud Run using Terraform
 
 ### Deployment Steps
 
-1. **Authenticate with Google Cloud:**
+We've bundled the entire deployment process into a single executable script so you don't have to manually build Docker images and Terraform states.
+
+1. **Copy Environment Variables:**
+   Make sure you have copied `server/.env.example` to `server/.env` and filled in your `GOOGLE_CLOUD_PROJECT`.
+
+2. **Run the Deployment Script:**
+   From the root repository directory, simply run:
    ```bash
-   gcloud auth login
-   gcloud auth application-default login
-   gcloud config set project YOUR_PROJECT_ID
+   ./deploy.sh
    ```
 
-2. **Initialize Terraform:**
-   ```bash
-   cd terraform
-   terraform init
-   ```
+The script will automatically:
+- Authenticate with your Google Cloud account
+- Initialize Terraform and create an Artifact Registry
+- Build the Node.js+React container locally
+- Push the Docker Image to your Google Cloud project
+- Deploy the Cloud Run application
 
-3. **Provide your Variables:**
-   Create a `terraform.tfvars` file in the `terraform/` directory:
-   ```hcl
-   project_id          = "your-gcp-project-id"
-   region              = "europe-west1"
-   ```
-
-4. **Create the Artifact Registry:**
-   First, we need to create the Docker repository before we can push our image.
-   ```bash
-   terraform apply -target=google_artifact_registry_repository.app_repo
-   ```
-
-5. **Build and Push the Docker Image:**
-   Return to the project root to build the monolithic container image and push it to the new registry.
-   *(Replace `europe-west3` and `YOUR_PROJECT_ID` with your actual values)*
-   
-   ```bash
-   cd ..
-   
-   # Authenticate Docker with your region
-   gcloud auth configure-docker europe-west1-docker.pkg.dev
-   
-   # Build the image
-   docker build --platform linux/amd64 -t europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest .
-   
-   # Push the image
-   docker push europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest
-   ```
-
-6. **Deploy the Cloud Run Service:**
-   Now deploy the actual Cloud Run service using the image you just pushed.
-   ```bash
-   cd terraform
-   
-   # We specify the image_url variable to use our newly pushed image
-   terraform apply -var="image_url=europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest"
-   ```
-
-After applying, Terraform will output your public `service_url`.
+After applying, the console will output your public **`service_url`**.
 
 ### Continuous Updates
-To deploy a new version of your code later, simply rebuild and push the Docker image, then tell Cloud Run to update:
-```bash
-gcloud run deploy instant-architect \
-  --image europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest \
-  --region europe-west1
-```
+To deploy a new version of your code later, simply run `./deploy.sh` again. It handles both fresh provisions and code updates automatically!
