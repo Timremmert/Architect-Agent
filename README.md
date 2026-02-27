@@ -4,7 +4,11 @@
 
 Welcome to **The Instant Architect**, an AI-powered interior design partner that "sees" through your device's camera, listens to your natural language instructions, and live-generates (in-paints) stunning furniture into your room using Generative AI.
 
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
+
 ## 🚀 Core Concept
+
+**📱 Recommended Experience: This application is best experienced on a smartphone!** The UI is optimized for mobile screens, allowing you to use your rear camera like an AR lens while talking to the AI. This can be done by accessing the deployed URL on your phone's browser.
 
 The application serves as an enthusiastic interior architect. By leveraging low-latency audio and vision streaming via WebSockets, you can have a natural conversation with the AI about your room. 
 
