@@ -133,13 +133,13 @@ The application can be deployed reproducibly to Google Cloud Run using Terraform
    cd ..
    
    # Authenticate Docker with your region
-   gcloud auth configure-docker europe-west3-docker.pkg.dev
+   gcloud auth configure-docker europe-west1-docker.pkg.dev
    
    # Build the image
-   docker build --platform linux/amd64 -t europe-west3-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest .
+   docker build --platform linux/amd64 -t europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest .
    
    # Push the image
-   docker push europe-west3-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest
+   docker push europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/instant-architect-repo/instant-architect:latest
    ```
 
 6. **Deploy the Cloud Run Service:**
