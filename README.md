@@ -1,5 +1,7 @@
 # The Instant Architect 🛋️✨
 
+**Built for the Google Live Agent Hackathon 2025** 🏆
+
 Welcome to **The Instant Architect**, an AI-powered interior design partner that "sees" through your device's camera, listens to your natural language instructions, and live-generates (in-paints) stunning furniture into your room using Generative AI.
 
 ## 🚀 Core Concept
@@ -16,7 +18,7 @@ The project is structured as a Monorepo containing a modern web frontend and a l
 - **Built with:** React and Vite (optimized for mobile Safari/Chrome).
 - **Functionality:** 
   - Captures full-screen video (`object-fit: cover`) from the user's mobile camera.
-  - Maintains a persistent WebSocket connection directly to the **Gemini Live API (Multimodal Bidi API)**.
+  - Maintains a persistent WebSocket connection to the **Node.js Backend**, which securely relays data to the GenAI Live API.
   - Streams 16kHz PCM audio and base64 video frames in real-time.
   - Receives AI audio responses and plays them back dynamically via the Web Audio API (`AudioContext`).
   - Listens for Gemini's specific `render_furniture` Function Calls to trigger the visual magic.
@@ -27,13 +29,13 @@ The project is structured as a Monorepo containing a modern web frontend and a l
   - Keeps the API keys secure.
   - Exposes the `/api/inpaint` endpoint.
   - Receives high-resolution frame snapshots from the client when the image generation tool is triggered.
-  - Communicates with the **Google GenAI SDK** (specifically utilizing advanced multimodal models like `gemini-3-pro-image-preview` / Imagen) to process the image and prompt, generating the in-painted result.
+  - Communicates with the **Google GenAI SDK** (specifically utilizing advanced multimodal models like `gemini-live-2.5-flash-native-audio` and `gemini-2.5-flash-image`) to process the image and prompt, generating the in-painted result.
 
 ## 🔄 The "Magic" Workflow
 
 1. **The Conversation:** The web app captures your microphone and camera. Data is continuously streamed to Gemini. The model is prompted with a specific persona ("Enthusiastic interior architect").
 2. **The Output:** Gemini speaks back to you. The frontend decodes the incoming base64 24kHz PCM audio chunks and plays them instantly.
-3. **The Trigger:** You tell the agent: "I want to see the couch." The Gemini model triggers the pre-defined `render_furniture` tool.
+3. **The Trigger:** You tell the agent: "I want to see the couch." The Gemini model triggers the pre-defined `render_furniture` or `render_room` tool. 
 4. **The Snapshot:** The frontend intercepts this tool call, instantly grabs a high-resolution snapshot of the video feed, and sends it to the local Express backend alongside the AI's parameters (e.g., `fabric`, `type`).
 5. **The In-Painting:** The Node.js server routes the image and the formulated prompt to Google's Image Generation API.
 6. **The Result:** The backend returns the final generated image (Base64), which the frontend overlays beautifully onto your screen as a "Wow" moment.
@@ -45,10 +47,11 @@ The project is structured as a Monorepo containing a modern web frontend and a l
 - A Google Cloud Project with Vertex AI API enabled.
 - [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) (`gcloud`) installed and authenticated.
 
+
 ### 1. Clone & Install
 ```bash
-git clone <repository-url>
-cd the-instant-architect
+git clone https://github.com/timremmert/Architect-Agent.git
+cd Architect-Agent
 
 # Install all workspace dependencies at once
 pnpm install
@@ -77,7 +80,7 @@ gcloud config set project YOUR_PROJECT_ID
 ### 4. Run the Development Server
 From the root `the-instant-architect` directory, you can start both the frontend and the backend simultaneously:
 ```bash
-pnpm dev
+pnpm run dev
 ```
 
 - The React frontend will run at `http://localhost:5173`
@@ -86,7 +89,7 @@ pnpm dev
 *(Note: Depending on your browser's security policies, you might need to access the app via `localhost` or set up HTTPS to allow microphone/camera permissions).*
 
 ## ⚠️ Notes on API Limits
-Image generation models (like `gemini-2.5-flash-image` or `imagen-3.0-generate-002`) have strict rate limits and quotas under the free tier. If you encounter a `429 Resource Exhausted` or `Quota` error, you may need to either link your API key to a billed Google Cloud Project or utilize a mock-mode.
+Image generation models (like `gemini-2.5-flash-image`) have strict rate limits and quotas under the free tier. If you encounter a `429 Resource Exhausted` or `Quota` error, you may need to either link your API key to a billed Google Cloud Project or utilize a mock-mode.
 
 ## ☁️ Deployment (Google Cloud Run)
 
@@ -96,6 +99,7 @@ The application can be deployed reproducibly to Google Cloud Run using Terraform
 - [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) (`gcloud`) installed and authenticated.
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) installed.
 - A Google Cloud Project with billing enabled.
+- [Docker](https://www.docker.com/) installed and running. (or Podman with Docker compatibility mode)
 
 ### Deployment Steps
 
@@ -112,6 +116,7 @@ We've bundled the entire deployment process into a single executable script so y
 
 The script will automatically:
 - Authenticate with your Google Cloud account
+- Enable required Google Cloud APIs (Artifact Registry, Cloud Run, Vertex AI)
 - Initialize Terraform and create an Artifact Registry
 - Build the Node.js+React container locally
 - Push the Docker Image to your Google Cloud project

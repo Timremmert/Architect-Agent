@@ -40,20 +40,23 @@ echo -e "\n${GREEN}Step 1: Authenticating with Google Cloud...${NC}"
 gcloud auth print-access-token > /dev/null 2>&1 || gcloud auth login
 gcloud config set project $GOOGLE_CLOUD_PROJECT
 
-echo -e "\n${GREEN}Step 2: Initializing Terraform and creating Artifact Registry...${NC}"
+echo -e "\n${GREEN}Step 2: Enabling required Google Cloud APIs...${NC}"
+gcloud services enable artifactregistry.googleapis.com run.googleapis.com aiplatform.googleapis.com cloudbuild.googleapis.com
+
+echo -e "\n${GREEN}Step 3: Initializing Terraform and creating Artifact Registry...${NC}"
 cd terraform
 terraform init
 terraform apply -target=google_artifact_registry_repository.app_repo -auto-approve
 cd ..
 
-echo -e "\n${GREEN}Step 3: Building Docker Image...${NC}"
+echo -e "\n${GREEN}Step 4: Building Docker Image...${NC}"
 gcloud auth configure-docker $GOOGLE_CLOUD_LOCATION-docker.pkg.dev --quiet
 docker build --platform linux/amd64 -t $IMAGE_NAME .
 
-echo -e "\n${GREEN}Step 4: Pushing Docker Image...${NC}"
+echo -e "\n${GREEN}Step 5: Pushing Docker Image...${NC}"
 docker push $IMAGE_NAME
 
-echo -e "\n${GREEN}Step 5: Deploying Cloud Run Service with Terraform...${NC}"
+echo -e "\n${GREEN}Step 6: Deploying Cloud Run Service with Terraform...${NC}"
 cd terraform
 terraform apply -var="image_url=$IMAGE_NAME" -auto-approve
 
