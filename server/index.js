@@ -102,7 +102,7 @@ app.post('/api/inpaint', upload.single('image'), async (req, res) => {
                 message: 'In-painting complete'
             });
         } else {
-            console.error("No image part found in Nano Banana response:", JSON.stringify(response));
+            console.error("No image part found in the API response:", JSON.stringify(response));
             throw new Error("No image returned from Google GenAI");
         }
 

@@ -73,7 +73,8 @@ html {
   flex-direction: column;
   justify-content: space-between;
   padding: 24px;
-  padding-bottom: calc(var(--gallery-height, 56px) + 24px); /* Dynamic push up */
+  padding-bottom: calc(var(--gallery-height, 56px) + 24px);
+  /* Dynamic push up */
   box-sizing: border-box;
   pointer-events: none;
   transition: padding-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -361,9 +362,11 @@ html {
 }
 
 .gallery-item {
-  min-width: 100px;
-  height: 100px;
-  border-radius: 16px;
+  height: 120px;
+  /* Slightly taller for better visibility */
+  aspect-ratio: 9 / 16;
+  /* Perfect portrait orientation for mobile thumbnails */
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
   border: 3px solid transparent;
