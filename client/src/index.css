@@ -29,15 +29,16 @@ html {
 #root {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  position: relative;
 }
 
 /* Dynamic Top: Camera View */
 .camera-view-port {
   width: 100%;
-  flex: 1;
-  position: relative;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
   background-color: #1a202c;
   overflow: hidden;
 }
@@ -72,8 +73,10 @@ html {
   flex-direction: column;
   justify-content: space-between;
   padding: 24px;
+  padding-bottom: calc(var(--gallery-height, 56px) + 24px); /* Dynamic push up */
   box-sizing: border-box;
   pointer-events: none;
+  transition: padding-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .header-bar {
@@ -292,6 +295,9 @@ html {
 
 /* 30% Bottom: Gallery Carousel */
 .gallery-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
   width: 100%;
   height: 30vh;
   background-color: var(--primary-color);

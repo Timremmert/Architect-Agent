@@ -172,7 +172,7 @@ function App() {
   const isConnected = status === 'connected';
 
   return (
-    <div id="root">
+    <div id="root" style={{ '--gallery-height': isGalleryOpen ? '30vh' : '56px' }}>
 
       {/* 
         ========================================================
