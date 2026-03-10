@@ -18,7 +18,7 @@ html {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
+  height: 100dvh;
   overflow: hidden;
   /* Prevent scrolling, act like an app */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -28,14 +28,15 @@ html {
 /* Fullscreen Layout Setup */
 #root {
   width: 100%;
-  height: 100%;
+  height: 100dvh;
   position: relative;
+  overflow: hidden;
 }
 
 /* Dynamic Top: Camera View */
 .camera-view-port {
   width: 100%;
-  height: 100%;
+  height: 100dvh;
   position: absolute;
   top: 0;
   left: 0;
@@ -300,7 +301,7 @@ html {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 30vh;
+  height: 30dvh;
   background-color: var(--primary-color);
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
   z-index: 20;
@@ -529,4 +530,54 @@ html {
 
 .close-modal-btn:active {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* 
+  ========================================================
+  MOBILE ADJUSTMENTS (Max 480px width)
+  ========================================================
+*/
+@media (max-width: 480px) {
+  .header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .title {
+    font-size: 1.1rem;
+    padding: 6px 12px;
+  }
+
+  .status-badge {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+
+  .style-badge {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    align-self: flex-start;
+  }
+
+  .ui-layer {
+    padding: 16px;
+    padding-bottom: calc(var(--gallery-height, 56px) + 16px);
+  }
+
+  .mic-button {
+    width: 56px;
+    height: 56px;
+  }
+
+  .rendering-overlay p {
+    font-size: 1rem;
+    padding: 0 16px;
+    text-align: center;
+  }
+
+  .gallery-header {
+    font-size: 0.85rem;
+    padding: 12px 16px;
+  }
 }

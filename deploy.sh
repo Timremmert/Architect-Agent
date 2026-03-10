@@ -51,10 +51,10 @@ cd ..
 
 echo -e "\n${GREEN}Step 4: Building Docker Image...${NC}"
 gcloud auth configure-docker $GOOGLE_CLOUD_LOCATION-docker.pkg.dev --quiet
-docker build --platform linux/amd64 -t $IMAGE_NAME .
+podman build --platform linux/amd64 -t $IMAGE_NAME .
 
 echo -e "\n${GREEN}Step 5: Pushing Docker Image...${NC}"
-docker push $IMAGE_NAME
+podman push $IMAGE_NAME
 
 echo -e "\n${GREEN}Step 6: Deploying Cloud Run Service with Terraform...${NC}"
 cd terraform

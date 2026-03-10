@@ -141,20 +141,7 @@ wss.on('connection', async (ws) => {
             const msg = JSON.parse(message);
             // Route the message to the appropriate Gemini session method
             if (msg.type === 'realtime_input') {
-                // The client sends data inside `media` (i.e. msg.data.media.mimeType)
-                const mediaPart = msg.data.media || msg.data;
-                if (mediaPart && mediaPart.mimeType && mediaPart.data) {
-
-                    if (chunkCount === 1) {
-                        console.log("FIRST CHUNK MIME:", mediaPart.mimeType);
-                    }
-                    session.sendRealtimeInput({
-                        media: {
-                            mimeType: mediaPart.mimeType,
-                            data: mediaPart.data
-                        }
-                    });
-                }
+                session.sendRealtimeInput(msg.data);
             } else if (msg.type === 'client_content') {
                 session.sendClientContent(msg.data);
             } else if (msg.type === 'tool_response') {
@@ -176,7 +163,7 @@ wss.on('connection', async (ws) => {
                         startOfSpeechSensitivity: "START_SENSITIVITY_LOW",
                         endOfSpeechSensitivity: "END_SENSITIVITY_LOW",
                         prefixPaddingMs: 20,
-                        silenceDurationMs: 500  // Nach 500ms Stille → automatischer Turn
+                        silenceDurationMs: 500  // After 500ms of silence → automatic turn
                     }
                 },
                 speechConfig: {
@@ -282,6 +269,10 @@ wss.on('connection', async (ws) => {
     }
 });
 
-server.listen(port, () => {
-    console.log(`Backend server with WS relay running on port ${port}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+    server.listen(port, () => {
+        console.log(`Backend server with WS relay running on port ${port}`);
+    });
+}
+
+export { app, server };

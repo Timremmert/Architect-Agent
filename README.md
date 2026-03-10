@@ -18,6 +18,8 @@ When you agree on a design suggestion (e.g., "Yes, put a blue Bauhaus couch ther
 
 The project is structured as a Monorepo containing a modern web frontend and a lightweight backend orchestrator.
 
+![Architecture](images/Architecture.png)
+
 ### 1. Frontend (`/client`)
 - **Built with:** React and Vite (optimized for mobile Safari/Chrome).
 - **Functionality:** 
