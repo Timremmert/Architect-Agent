@@ -64,16 +64,11 @@ pnpm install
 ```
 
 ### 2. Environment Variables
-You only need to configure the backend API URL for the frontend.
-
-**Frontend (`client/.env`):**
-```env
-VITE_API_BASE_URL=http://localhost:3001
-```
+You only need to configure the backend Google Cloud Project ID for the frontend.
 
 **Backend (`server/.env`):**
 ```env
-PORT=3001
+GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID
 ```
 
 ### 3. Google Cloud Authentication
@@ -93,6 +88,9 @@ pnpm run dev
 - The Express backend will run at `http://localhost:3001`
 
 *(Note: Depending on your browser's security policies, you might need to access the app via `localhost` or set up HTTPS to allow microphone/camera permissions).*
+
+## ⚠️ Notes on API
+You may need to set up a billing account for your Google Cloud Project and activate the Vertex AI API to use the API.
 
 ## ⚠️ Notes on API Limits
 Image generation models (like `gemini-2.5-flash-image`) have strict rate limits and quotas under the free tier. If you encounter a `429 Resource Exhausted` or `Quota` error, you may need to either link your API key to a billed Google Cloud Project or utilize a mock-mode.

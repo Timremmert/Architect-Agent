@@ -198,10 +198,7 @@ function App() {
             <div className="header-bar">
               <h1 className="title">Instant Architect</h1>
 
-              <div className="status-badge">
-                <div className={`status-dot ${isProcessing ? 'processing' : isConnected ? 'active' : ''}`}></div>
-                {isProcessing ? 'Generating...' : isConnected ? 'Listening' : 'Ready (Tap Mic)'}
-              </div>
+
             </div>
 
             {currentStyle && (

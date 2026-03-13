@@ -98,7 +98,7 @@ export function useGeminiLive() {
                 wsUrl = `${protocol}//${window.location.host}/api/live`;
             } else {
                 // In dev, the API base URL might be set, or fallback to localhost
-                const devBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+                const devBaseUrl = 'http://localhost:3001';
                 wsUrl = devBaseUrl.replace('http:', 'ws:').replace('https:', 'wss:') + '/api/live';
             }
 
