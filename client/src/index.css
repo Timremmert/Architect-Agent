@@ -96,10 +96,10 @@ html {
 }
 
 .style-badge {
-  background: var(--surface-color);
+  background: var(--overlay-bg);
   color: var(--text-main);
   padding: 8px 16px;
-  border-radius: 24px;
+  border-radius: 12px;
   font-size: 0.85rem;
   font-weight: 600;
   align-self: flex-end;

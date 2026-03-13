@@ -60,4 +60,5 @@ echo -e "\n${GREEN}Step 6: Deploying Cloud Run Service with Terraform...${NC}"
 cd terraform
 terraform apply -var="image_url=$IMAGE_NAME" -auto-approve
 
+
 echo -e "\n${GREEN}=== Deployment Complete! ===${NC}"
