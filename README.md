@@ -4,7 +4,7 @@
 
 Welcome to **The Instant Architect**, an AI-powered interior design partner that "sees" through your device's camera, listens to your natural language instructions, and live-generates (in-paints) stunning furniture into your room using Generative AI.
 
-[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run/?git_repo=https://github.com/Timremmert/Architect-Agent.git)
 
 ## 🚀 Core Concept
 
