@@ -1,6 +1,6 @@
 # The Instant Architect 🛋️✨
 
-**Built for the Google Live Agent Hackathon 2025** 🏆
+**Built for the Google Live Agent Hackathon 2026** 🏆
 
 Welcome to **The Instant Architect**, an AI-powered interior design partner that "sees" through your device's camera, listens to your natural language instructions, and live-generates (in-paints) stunning furniture into your room using Generative AI.
 
