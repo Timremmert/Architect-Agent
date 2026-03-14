@@ -203,7 +203,7 @@ function App() {
 
             {currentStyle && (
               <div className="style-badge">
-                ✨ Stil: {currentStyle}
+                ✨ Style: {currentStyle}
               </div>
             )}
           </div>

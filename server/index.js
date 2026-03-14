@@ -175,33 +175,33 @@ wss.on('connection', async (ws) => {
                 },
                 systemInstruction: {
                     parts: [{
-                        text: "Du bist The Instant Architect, ein kreativer Innenarchitekt.\n1. Stelle dich zuerst kurz vor.\n2. Frage nach dem bevorzugten Stil.\n3. Mach proaktive Einrichtungsvorschläge zum Kamerabild.\n4. Nutze IMMER 'render_furniture' wenn der Nutzer zustimmt.\n5. Nutze IMMER 'render_room' wenn der Nutzer eine vollständige Neugestaltung wünscht.\nREGEL: Lehne alle Themen außer Raumgestaltung sofort ab."
+                        text: "You are 'The Instant Architect', an enthusiastic and highly skilled interior designer. You can see the user's room through their camera.\n1. Warmly introduce yourself in one short sentence.\n2. Immediately analyze the room you see and ask the user about their preferred aesthetic or style.\n3. Proactively suggest specific furniture additions or design changes based on what you see. Keep your spoken responses concise and conversational.\n4. CRITICAL: If the user agrees to add a specific piece of furniture, you MUST immediately call the render_furniture tool.\n5. CRITICAL: If the user asks for a complete redesign of the space, you MUST immediately call the render_room tool.\n6. RULE: Strictly refuse to discuss any topics outside of interior design, architecture, or room aesthetics."
                     }]
                 },
                 tools: [{
                     functionDeclarations: [{
                         name: "render_furniture",
-                        description: "Erzeugt ein Bild eines Möbelstücks in einem spezifischen Bereich des Raums, wenn der Nutzer einem Design-Vorschlag zustimmt.",
+                        description: "Creates an image of a furniture piece in a specific area of the room, when the user agrees to create a furniture.",
                         parameters: {
                             type: "object",
                             properties: {
-                                furniture_type: { type: "string", description: "z.B. Bauhaus Couch, Stehlampe" },
-                                material: { type: "string", description: "z.B. blauer Stoff, Holz, Metall" },
-                                coordinates: { type: "string", description: "Position im Bild (z.B. 'unten links', 'mitte')" },
-                                style: { type: "string", description: "z.B. Modern, Bauhaus, Art Deco" }
+                                furniture_type: { type: "string", description: "e.g. Bauhaus Couch, Lamp" },
+                                material: { type: "string", description: "e.g. blue fabric, wood, metal" },
+                                coordinates: { type: "string", description: "Position in the image (e.g. 'bottom left', 'center')" },
+                                style: { type: "string", description: "e.g. Modern, Bauhaus, Art Deco" }
                             },
                             required: ["furniture_type", "style"]
                         }
                     },
                     {
                         name: "render_room",
-                        description: "Erzeugt ein Bild eines komplett neu gestalteten Raumes, wenn der Nutzer eine vollständige Neugestaltung wünscht.",
+                        description: "Creates an image of a completely new room, when the user wants a complete renovation.",
                         parameters: {
                             type: "object",
                             properties: {
-                                style: { type: "string", description: "z.B. Modern, Bauhaus, Art Deco" },
-                                color_palette: { type: "string", description: "z.B. Blau-Grau Töne, Warme Erdtöne" },
-                                mood: { type: "string", description: "z.B. Gemütlich, Minimalistisch, Luxuriös" }
+                                style: { type: "string", description: "e.g. Modern, Bauhaus, Art Deco" },
+                                color_palette: { type: "string", description: "e.g. Blue-Grey Tones, Warm Earth Tones" },
+                                mood: { type: "string", description: "e.g. cozy, minimalist, luxurious" }
                             },
                             required: ["style", "color_palette"]
                         }
@@ -234,7 +234,22 @@ wss.on('connection', async (ws) => {
                         console.log("Gemini message:", Object.keys(data).join(', '));
                     }
 
-                    ws.send(JSON.stringify({ type: 'message', data }));
+                    if (ws.readyState === 1) { // 1 = OPEN
+                        ws.send(JSON.stringify({ type: 'message', data }));
+                    } else if (ws.readyState === 2 || ws.readyState === 3) {
+                        // Client is closing or closed, but we're still receiving data. 
+                        // It means the session didn't cleanly shut down yet.
+                        if (geminiSession) {
+                            console.log("Client WS closed but Gemini session still active. Shutting down.");
+                            // Best-effort shutdown of the GenAI Session
+                            try {
+                                if (geminiSession.websocket && typeof geminiSession.websocket.close === 'function') {
+                                    geminiSession.websocket.close();
+                                }
+                            } catch (e) { /* ignore */ }
+                            geminiSession = null;
+                        }
+                    }
                 },
                 onclose: (event) => {
                     //console.log('Gemini Live connection closed:', event);
@@ -260,6 +275,20 @@ wss.on('connection', async (ws) => {
 
         ws.on('close', () => {
             console.log('Client disconnected from Live API WebSocket relay');
+
+            // Explicitly force the Gemini connection to close if the client leaves
+            if (geminiSession) {
+                console.log("Cleaning up Gemini session...");
+                try {
+                    // The AI SDK's exact closing mechanisms can vary, but we can safely close the underlying WS.
+                    if (geminiSession.websocket && typeof geminiSession.websocket.close === 'function') {
+                        geminiSession.websocket.close();
+                    }
+                } catch (e) {
+                    console.error("Error closing Gemini session:", e);
+                }
+                geminiSession = null;
+            }
         });
 
     } catch (err) {

@@ -13,6 +13,7 @@ export function useGeminiLive() {
     const scriptProcessorRef = useRef(null);
     const playbackContextRef = useRef(null);
     const nextPlayTimeRef = useRef(0);
+    const streamRef = useRef(null);
 
     // Keep track of the function call trigger
     const onFunctionCallRef = useRef(null);
@@ -60,6 +61,11 @@ export function useGeminiLive() {
         if (scriptProcessorRef.current) {
             scriptProcessorRef.current.disconnect();
             scriptProcessorRef.current = null;
+        }
+
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
         }
 
         if (audioContextRef.current) {
@@ -112,7 +118,7 @@ export function useGeminiLive() {
                 const initialTurn = {
                     turns: [{
                         role: "user",
-                        parts: [{ text: "Hallo! Ich bin bereit für deine Einrichtungsvorschläge." }]
+                        parts: [{ text: "Hello! I am ready for your interior design suggestions." }]
                     }],
                     turnComplete: true
                 };
@@ -180,6 +186,8 @@ export function useGeminiLive() {
                         autoGainControl: true
                     }
                 });
+
+                streamRef.current = stream;
 
                 // Load our custom AudioWorklet processor from the public folder
                 await context.audioWorklet.addModule('/pcm-processor.js');
