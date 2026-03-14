@@ -130,3 +130,10 @@ After applying, the console will output your public **`service_url`**.
 
 ### Continuous Updates
 To deploy a new version of your code later, simply run `./deploy.sh` again. It handles both fresh provisions and code updates automatically!
+
+Or try the one-liner:
+```bash
+gcloud run deploy instant-architect \
+  --image europe-west1-docker.pkg.dev/PROJECT-ID/instant-architect-repo/instant-architect:latest \
+  --region europe-west1
+```
