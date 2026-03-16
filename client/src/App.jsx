@@ -320,7 +320,7 @@ function App() {
           {/* Modal Controls (Close) */}
           <div className="modal-controls">
             <button className="close-modal-btn" onClick={() => setSelectedImagePair(null)}>
-              Zurück zur Kamera
+              Back to Camera
             </button>
           </div>
         </div>
